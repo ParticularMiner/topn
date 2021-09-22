@@ -304,7 +304,6 @@ int topn_parallel(
 		r[0] = 0;
 		partial_sum(indptr.data(), indptr.data() + n_rows, r + 1);
 	}
-
 	return dest_job_starts[n_jobs];
 }
 template int topn_parallel<float>(int n, int r[], int c[], float d[], int ntop, int n_rows, int n_jobs);
