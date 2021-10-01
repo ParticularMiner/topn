@@ -2,6 +2,6 @@
 import sys
 
 if sys.version_info[0] >= 3:
-    from topn.awesome_topn import awesome_topn
+    from topn.awesome_topn import awesome_topn, awesome_hstack_topn
 else:
-    from awesome_topn import awesome_topn
+    from awesome_topn import awesome_topn, awesome_hstack_topn

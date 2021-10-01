@@ -2,7 +2,7 @@ import sys
 import numpy as np
 
 if sys.version_info[0] >= 3:
-    # from topn import topn as ct
+    from topn import topn as ct
     from topn import topn_threaded as ct_thread
 else:
     # import topn as ct
@@ -56,3 +56,39 @@ def awesome_topn(r, c, d, ntop, n_rows=-1, n_jobs=1):
     cc.resize(new_len, refcheck=False)
     dd.resize(new_len, refcheck=False)
     return rr, cc, dd
+
+
+def awesome_hstack_topn(blocks, ntop, use_threads=False, n_jobs=1):
+    n_blocks = len(blocks)
+    r = np.concatenate([b.indptr for b in blocks])
+    c = np.concatenate([b.indices for b in blocks])
+    d = np.concatenate([b.data for b in blocks])
+    n_cols = np.array([b.shape[1] for b in blocks])
+    M = blocks[0].shape[0]
+    N = np.sum(n_cols)
+    if len(d) > 0:
+        hstack_indptr = np.empty(M + 1, dtype=c.dtype)
+        hstack_indices = np.empty(len(c), dtype=c.dtype)
+        hstack_data = np.empty(len(d), dtype=d.dtype)
+        if not use_threads:
+            ct.sparse_topn(
+                n_blocks, M, n_cols,
+                r, c, d,
+                ntop,
+                hstack_indptr, hstack_indices, hstack_data
+            )
+        else:
+            ct_thread.sparse_topn_threaded(
+                n_blocks, M, n_cols,
+                r, c, d,
+                ntop,
+                hstack_indptr, hstack_indices, hstack_data,
+                n_jobs
+            )
+    else:
+        hstack_indptr = np.zeros(M + 1, dtype=c.dtype)
+        hstack_indices = np.empty(0, dtype=c.dtype)
+        hstack_data = np.empty(0, dtype=d.dtype)
+    return csr_matrix((hstack_data, hstack_indices, hstack_indptr), shape=(M, N))
+
+

@@ -56,9 +56,9 @@ threaded_ext = Extension('topn.topn_threaded',
 
 setup(
     name='topn',
-    version='0.0.4-1',
+    version='0.0.5',
     description='This package boosts a group-wise nlargest sort',
-    keywords='nlargest scipy cython',
+    keywords='nlargest hstack csr csc scipy cython',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/ParticularMiner/topn',
@@ -82,7 +82,7 @@ setup(
     zip_safe=False,
     packages=find_packages(),
     cmdclass={'build_ext': my_build_ext},
-    ext_modules=[threaded_ext],
+    ext_modules=[original_ext, threaded_ext],
     package_data = {
         'topn': ['./topn/*.pxd']
     },

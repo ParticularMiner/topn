@@ -1,5 +1,5 @@
-#ifndef UTILS_CPPCLASS_H
-#define UTILS_CPPCLASS_H
+#ifndef TOPN_PARALLEL_CPPCLASS_H
+#define TOPN_PARALLEL_CPPCLASS_H
 
 template<typename T>
 struct rcd {
@@ -26,4 +26,19 @@ extern int topn_parallel(
 		int n_jobs
 );
 
-#endif //UTILS_CPPCLASS_H
+template<typename T>
+void sparse_topn_parallel(
+		int n_blocks,
+		int n_row,
+		int n_col[],
+		int Ap[],
+		int Aj[],
+		T Ax[],	//data of A
+		int ntop,
+		int Bp[],
+		int Bj[],
+		T Bx[],	//data of output
+		int n_jobs
+);
+
+#endif //TOPN_PARALLEL_CPPCLASS_H
