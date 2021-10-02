@@ -39,6 +39,19 @@ cdef extern from "topn_parallel.h":
 		int n_jobs
 	) except +;
 
+	cdef void sparse_hstack_parallel[T](
+		int n_blocks,
+		int n_row,
+		int n_col[],
+		int Ap[],
+		int Aj[],
+		T Ax[],  # data of A
+		int Bp[],
+		int Bj[],
+		T Bx[],  # data of output
+		int n_jobs
+	) except +;
+
 cpdef topn_threaded(
 	np.ndarray[int, ndim=1] r,
 	np.ndarray[int, ndim=1] c,
@@ -104,4 +117,27 @@ cpdef sparse_topn_threaded(
 	cdef float_ft* Bx = &b_data[0]
 	
 	sparse_topn_parallel(n_blocks, n_row, n_col, Ap, Aj, Ax, ntop, Bp, Bj, Bx, n_jobs)
+
+cpdef sparse_hstack_threaded(
+	int n_blocks,
+	int n_row,
+	np.ndarray[int, ndim=1] n_cols,
+	np.ndarray[int, ndim=1] a_indptr,
+	np.ndarray[int, ndim=1] a_indices,
+	np.ndarray[float_ft, ndim=1] a_data,
+	np.ndarray[int, ndim=1] b_indptr,
+	np.ndarray[int, ndim=1] b_indices,
+	np.ndarray[float_ft, ndim=1] b_data,
+	int n_jobs
+):
+
+	cdef int* n_col = &n_cols[0]
+	cdef int* Ap = &a_indptr[0]
+	cdef int* Aj = &a_indices[0]
+	cdef float_ft* Ax = &a_data[0]
+	cdef int* Bp = &b_indptr[0]
+	cdef int* Bj = &b_indices[0]
+	cdef float_ft* Bx = &b_data[0]
+	
+	sparse_hstack_parallel(n_blocks, n_row, n_col, Ap, Aj, Ax, Bp, Bj, Bx, n_jobs)
 

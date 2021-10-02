@@ -27,7 +27,7 @@ extern int topn_parallel(
 );
 
 template<typename T>
-void sparse_topn_parallel(
+extern void sparse_topn_parallel(
 		int n_blocks,
 		int n_row,
 		int n_col[],
@@ -35,6 +35,20 @@ void sparse_topn_parallel(
 		int Aj[],
 		T Ax[],	//data of A
 		int ntop,
+		int Bp[],
+		int Bj[],
+		T Bx[],	//data of output
+		int n_jobs
+);
+
+template<typename T>
+extern void sparse_hstack_parallel(
+		int n_blocks,
+		int n_row,
+		int n_col[],
+		int Ap[],
+		int Aj[],
+		T Ax[],	//data of A
 		int Bp[],
 		int Bj[],
 		T Bx[],	//data of output

@@ -59,7 +59,56 @@ def awesome_topn(r, c, d, ntop, n_rows=-1, n_jobs=1):
     return rr, cc, dd
 
 
-def awesome_hstack_topn(blocks, ntop, use_threads=False, n_jobs=1):
+def awesome_hstack_topn(blocks, ntop, use_threads=False, sort=True, n_jobs=1):
+    n_blocks = len(blocks)
+    r = np.concatenate([b.indptr for b in blocks])
+    c = np.concatenate([b.indices for b in blocks])
+    d = np.concatenate([b.data for b in blocks])
+    n_cols = np.array([b.shape[1] for b in blocks]).astype(c.dtype)
+    M = blocks[0].shape[0]
+    N = np.sum(n_cols)
+    if len(d) > 0:
+        hstack_indptr = np.empty(M + 1, dtype=c.dtype)
+        hstack_indices = np.empty(len(c), dtype=c.dtype)
+        hstack_data = np.empty(len(d), dtype=d.dtype)
+        if (ntop < N) or sort:
+            if not use_threads:
+                ct.sparse_topn(
+                    n_blocks, M, n_cols,
+                    r, c, d,
+                    ntop,
+                    hstack_indptr, hstack_indices, hstack_data
+                )
+            else:
+                ct_thread.sparse_topn_threaded(
+                    n_blocks, M, n_cols,
+                    r, c, d,
+                    ntop,
+                    hstack_indptr, hstack_indices, hstack_data,
+                    n_jobs
+                )
+        else:
+            if not use_threads:
+                ct.sparse_hstack(
+                    n_blocks, M, n_cols,
+                    r, c, d,
+                    hstack_indptr, hstack_indices, hstack_data
+                )
+            else:
+                ct_thread.sparse_hstack_threaded(
+                    n_blocks, M, n_cols,
+                    r, c, d,
+                    hstack_indptr, hstack_indices, hstack_data,
+                    n_jobs
+                )
+    else:
+        hstack_indptr = np.zeros(M + 1, dtype=c.dtype)
+        hstack_indices = np.empty(0, dtype=c.dtype)
+        hstack_data = np.empty(0, dtype=d.dtype)
+    return csr_matrix((hstack_data, hstack_indices, hstack_indptr), shape=(M, N))
+
+
+def awesome_hstack(blocks, use_threads=False, n_jobs=1):
     n_blocks = len(blocks)
     r = np.concatenate([b.indptr for b in blocks])
     c = np.concatenate([b.indices for b in blocks])
@@ -72,17 +121,15 @@ def awesome_hstack_topn(blocks, ntop, use_threads=False, n_jobs=1):
         hstack_indices = np.empty(len(c), dtype=c.dtype)
         hstack_data = np.empty(len(d), dtype=d.dtype)
         if not use_threads:
-            ct.sparse_topn(
+            ct.sparse_hstack(
                 n_blocks, M, n_cols,
                 r, c, d,
-                ntop,
                 hstack_indptr, hstack_indices, hstack_data
             )
         else:
-            ct_thread.sparse_topn_threaded(
+            ct_thread.sparse_hstack_threaded(
                 n_blocks, M, n_cols,
                 r, c, d,
-                ntop,
                 hstack_indptr, hstack_indices, hstack_data,
                 n_jobs
             )
