@@ -69,14 +69,14 @@ setup(
     setup_requires=[
         # Setuptools 18.0 properly handles Cython extensions.
         'setuptools>=42',
-        'cython>=0.29.15',
+        'cython<3',
         'numpy>=1.16.6', # select this version for Py2/3 compatible
         'scipy>=1.2.3'   # select this version for Py2/3 compatible
     ],
     install_requires=[
         # Setuptools 18.0 properly handles Cython extensions.
         'setuptools>=42',
-        'cython>=0.29.15',
+        'cython<3',
         'numpy>=1.16.6', # select this version for Py2/3 compatible
         'scipy>=1.2.3'   # select this version for Py2/3 compatible
     ],
